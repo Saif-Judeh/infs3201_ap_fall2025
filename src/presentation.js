@@ -1,6 +1,11 @@
 const prompt = require('prompt-sync')()
 const business = require('./business')
 
+/**
+ * format date into a readable form
+ * @param {string} rawDate - raw date string 
+ * @returns {string} - formatted data
+ */
 function formatDate(rawDate){
     try{
         return new Date(rawDate).toLocaleDateString("en-US",{
@@ -11,7 +16,11 @@ function formatDate(rawDate){
     }
 }
 
-
+/**
+ * find and display a photos details if owned by user 
+ * @param {{id:number}} user - the logged in user
+ * @returns {promise<void>}
+ */
 async function menuFindPhoto(user){
     let pid = Number(prompt('Photo ID? '))
     let p = await business.getPhotoDetailSecure(pid,user)
@@ -42,7 +51,11 @@ async function menuFindPhoto(user){
         'Tags: '+tagsString
     )
 }
-
+/**
+ * update a photos title and description if owned by the user
+ * @param {{id:number}} user - the logged in user 
+ * @returns {promise<void>}
+ */
 async function menuUpdatePhoto(user) {
     let pid = Number(prompt('Photo ID? '))
     let p = await business.getPhotoDetailSecure(pid,user)
@@ -60,7 +73,11 @@ async function menuUpdatePhoto(user) {
         console.log('Update Failed')
     }          
 }
-
+/**
+ * show all photos in an album that belong to the user
+ * @param {{id:number}} user - the logged in user
+ * @returns {promise<void>}
+ */
 async function menuAlbumPhotos(user) {
     let name = prompt('Album name? ')
     let albumId = await business.findAlbumIdByName(name)
@@ -82,7 +99,11 @@ async function menuAlbumPhotos(user) {
 
     }  
 }
-
+/**
+ * add a tag to a photo owned by a user
+ * @param {{id:number}} user - the logged in user
+ * @returns {promise<void>}
+ */
 async function menuTagPhoto(user) {
     let pid = Number(prompt('Photo ID? '))
     let p = await business.getPhotoDetailSecure(pid,user)
@@ -107,7 +128,10 @@ async function menuTagPhoto(user) {
     }
     
 }
-
+/**
+ * the main entry point, login feature and shows the interactive menu
+ * @returns {promise<void>}
+ */
 async function run() {
     console.log('== Login ==')
     let user = await business.login(prompt('Username: '), prompt('Password: '))
