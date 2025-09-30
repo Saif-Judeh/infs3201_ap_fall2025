@@ -68,10 +68,37 @@ async function getUserPhotosInAlbum(albumId,user){
     }
     return out
 }
+
+async function getAlbumNamesById(ids){
+    let albums = await db.getAllAlbums()
+    let names = []
+    for (let wantedId of ids){
+        for(let a of albums){
+            if(a.id===wantedId){
+                names.push(a.name)
+                break
+            }
+        }
+    }
+    return names
+}
+
+async function findAlbumIdByName(name) {
+    let albums = await db.getAllAlbums()
+    let target = name.toLowerCase()
+    for(let a of albums){
+        if(a.name.toLowerCase()===target){
+            return a.id
+        }
+    }
+    return null
+}
 module.exports = {
     login,
     getPhotoDetailSecure,
     updatePhotoSecure,
     addTagSecure,
-    getUserPhotosInAlbum
+    getUserPhotosInAlbum,
+    getAlbumNamesById,
+    findAlbumIdByName
 }
