@@ -1,21 +1,47 @@
-const mongo = require('mongodb')
+const mongodb = require('mongodb')
 
 
-
+let client 
+let db
+let albumCollection 
+let photoCollection
 
 /**
- * get all photos from storage
- * @returns 
+ * establish and cache a connection to the MongoDB database 
+ * creates global handles for the album and photo collection 
+ * 
+ * @returns {promise<void>}
+ */
+async function connectDatabase(){
+    if (!client){
+        client = new mongodb.MongoClient('mongodb+srv://60306539_db_user:12class34@infs3201.amrmeux.mongodb.net/?retryWrites=true&w=majority&appName=INFS3201')
+        await client.connect()
+        db = client.db('infs3201_fall2025')
+        albumCollection = db.collection('albums')
+        photoCollection = db.collection('photos')
+    }
+}
+
+/**
+ * get all photos from database
+ * @returns {promise<object[]>} - array of photo objects
  */
 async function getAllPhotos(){
-    return readJson(PHOTO_PATH)
+    await connectDatabase()
+    let result = photoCollection.find()
+    let data = await result.toArray()
+    return data
 }
+
 /**
  * get all albums from storage
  * @returns {promise<object[]>} - array of album objects
  */
 async function getAllAlbums(){
-    return readJson(ALBUM_PATH)
+    await connectDatabase()
+    let result = albumCollection.find()
+    let data = await result.toArray()
+    return data
 }
 
 
@@ -25,36 +51,25 @@ async function getAllAlbums(){
  * @returns {promise<object | undefined>} - photo object if found, else undefined.
  */
 async function findPhotoById(id){
-    let list = await getAllPhotos()
-    for (let p of list){
-        if (p.id === id){
-            return p
-        }
-    }
-    return undefined
+    await connectDatabase()
+    let result = await photoCollection.findOne({id:Number(id)})
+    return result
 }
 /**
  * update an existing photo in storage
- * @param {object} updated - updated photo object
+ * @param {number} id - the photo id
+ * @param {string} title - new title text
+ * @param {string} desc - new description text
  * @returns {promise<boolean>} - true if updated, otherwise false
  */
-async function updatePhoto(updated){
-    let list = await getAllPhotos()
-    let found = false
-    let index = 0 
-    for (let p of list){
-        if(p.id === updated.id){
-            list[index] = updated
-            found = true
-            break
-        }
-        index++
-    }
-    if(!found){
-        return false
-    }
-    await saveAllPhotos(list)
-    return true
+async function updatePhoto(id, title, desc){
+    await connectDatabase()
+    let result = await photoCollection.updateOne(
+        {id:Number(id)},
+        {$set: {title: title, description: desc}}
+    )
+    return res.matchedCount === 1
+
 }
 
 module.exports = {
