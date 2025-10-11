@@ -1,12 +1,22 @@
 const db = require('./persistence')
 
+
+/**
+ * Gets all the albums from the database
+ * @returns {promise<Object>} - an array of album documents
+ */
+async function getAllAlbums() {
+    let albums = await db.getAllAlbums()
+    return albums
+}
+
 /**
  * get all photos in a specific album that belong to a user.
  * @param {number} albumId - album id.
  * @param {{id:number}} user - the logged in user.
  * @returns {promise<object[]>} array of photo objects owned by user in the album.
  */
-async function getUserPhotosInAlbum(albumId,user){
+async function getPhotosInAlbum(albumId){
     let list = await db.getAllPhotos()
     let out =[]
     for(let p of list){
@@ -19,41 +29,30 @@ async function getUserPhotosInAlbum(albumId,user){
     }
     return out
 }
-/**
- * convert an array of album ids into their album names
- * @param {number[]} ids - array of album ID's. 
- * @returns {promise<string[]>} - array of album names.
- */
-async function getAlbumNamesById(ids){
-    let albums = await db.getAllAlbums()
-    let names = []
-    for (let wantedId of ids){
-        for(let a of albums){
-            if(a.id===wantedId){
-                names.push(a.name)
-                break
-            }
-        }
-    }
-    return names
-}
+
 /**
  * find an album id by name
  * @param {stirng} name - album name. 
  * @returns {promise<number | null>} - the album id if found, else null.
  */
-async function findAlbumIdByName(name) {
-    let albums = await db.getAllAlbums()
-    let target = name.toLowerCase()
-    for(let a of albums){
-        if(a.name.toLowerCase()===target){
-            return a.id
-        }
+async function getPhotoById(id) {
+    let photo = await db.findPhotoById(Number(id))
+    return photo
+
+}
+
+async function updatePhoto(id,title,desc) {
+    let exists = await db.findPhotoById(Number(id))
+    if(!exists){
+        return false 
     }
-    return null
+    let ok = await db.updatePhoto(Number(id), title, desc)
+    return ok
+    
 }
 module.exports = {
-    getUserPhotosInAlbum,
-    getAlbumNamesById,
-    findAlbumIdByName
+    getPhotosInAlbum,
+    getAllAlbums,
+    getPhotoById,
+    updatePhoto
 }
