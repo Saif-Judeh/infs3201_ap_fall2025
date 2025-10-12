@@ -41,6 +41,13 @@ async function getPhotoById(id) {
 
 }
 
+/**
+ * updates the title and description of an existing photo. 
+ * @param {Number} id - unique id of photo.
+ * @param {String} title - new title for photo.
+ * @param {String} desc - new description for photo .
+ * @returns {Promise<Boolean>} - True if the update was successful, otherwise false.
+ */
 async function updatePhoto(id,title,desc) {
     let exists = await db.findPhotoById(Number(id))
     if(!exists){

@@ -68,7 +68,7 @@ async function updatePhoto(id, title, desc){
         {id:Number(id)},
         {$set: {title: title, description: desc}}
     )
-    return res.matchedCount === 1
+    return result.matchedCount === 1
 
 }
 
